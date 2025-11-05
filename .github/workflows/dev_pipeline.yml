@@ -78,7 +78,7 @@ jobs:
             BUILD_TS=${{ github.run_id }}
       
       - name: Trivy scan
-        uses: aquasecurity/trivy-action@v0
+        uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: finml-api:dev-scan
           format: table
