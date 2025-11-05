@@ -23,25 +23,31 @@ def _select_adj_close(df: pd.DataFrame, ticker: str) -> pd.Series:
         if ("Adj Close", "") in cols:
             candidates.append(("Adj Close", ""))
 
-        candidates += [c for c in cols if isinstance(c, tuple) and c[0] == "Adj Close"]
+        candidates += [
+            c for c in cols if isinstance(c, tuple) and c[0] == "Adj Close"
+        ]
         for c in candidates:
             s = df[c].dropna()
             if not s.empty:
                 s.name = "Adj Close"
                 return s
-            
+
         close_candidates = []
         if ("Close", ticker) in cols:
             close_candidates.append(("Close", ticker))
-        close_candidates += [c for c in cols if isinstance(c, tuple) and c[0] == "Close"]
+        close_candidates += [
+            c for c in cols if isinstance(c, tuple) and c[0] == "Close"
+        ]
         for c in close_candidates:
             s = df[c].dropna()
             if not s.empty:
                 s.name = "Adj Close"
                 return s
 
-        raise ValueError("Could not find Adj Close or Close in MultiIndex columns")
-    
+        raise ValueError(
+            "Could not find Adj Close or Close in MultiIndex columns"
+        )
+
     # Single-level columns: prefer 'Adj Close', fallback to 'Close'
     if "Adj Close" in df.columns:
         s = df["Adj Close"].dropna()
@@ -56,9 +62,12 @@ def _select_adj_close(df: pd.DataFrame, ticker: str) -> pd.Series:
     raise ValueError("No Adj Close or Close column available")
 
 
-def get_price_history(ticker: str, period: str = YF_PERIOD, interval: str = YF_INTERVAL) -> pd.DataFrame:
+def get_price_history(
+    ticker: str, period: str = YF_PERIOD, interval: str = YF_INTERVAL
+) -> pd.DataFrame:
     """
-    Returns a DataFrame with a single column 'Adj Close' indexed by DatetimeIndex (tz-naive).
+    Returns a DataFrame with a single column 'Adj Close' indexed
+    by DatetimeIndex (tz-naive).
     Robust to MultiIndex columns and to missing 'Adj Close'.
     """
     df = yf.download(
@@ -66,8 +75,8 @@ def get_price_history(ticker: str, period: str = YF_PERIOD, interval: str = YF_I
         period=period,
         interval=interval,
         progress=False,
-        group_by="column",   # helps avoid MultiIndex in many cases
-        auto_adjust=False    # keep both Close/Adj Close if available
+        group_by="column",  # helps avoid MultiIndex in many cases
+        auto_adjust=False,  # keep both Close/Adj Close if available
     )
 
     if df is None or df.empty:
@@ -107,7 +116,9 @@ def get_cdi_annual_rate(default: float = 0.10) -> float:
         start = end - dt.timedelta(days=400)
         baseUrl = "https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados"
         format = "formato=json"
-        url = f"{baseUrl}?{format}&dataInicial={start.strftime('%d/%m/%Y')}&dataFinal={end.strftime('%d/%m/%Y')}"
+        url = f"{baseUrl}?{format}&dataInicial={
+            start.strftime('%d/%m/%Y')}&dataFinal={
+                end.strftime('%d/%m/%Y')}"
         r = requests.get(url, timeout=10)
         r.raise_for_status()
         rows = r.json()
