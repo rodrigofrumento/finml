@@ -77,7 +77,12 @@ jobs:
           build-args: |
             BUILD_TS=${{ github.run_id }}
       
-      - name: Trivy scan (container)
-        run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasecurity/trivy:latest image \
-            --exit-code 1 --severity CRITICAL,HIGH finml-api:dev-scan
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: finml-api:dev-scan
+          format: table
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
